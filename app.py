@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import asyncio
-from tt_saver_api import get_video_url   # import hàm lấy link video
+from .tt_saver_api import get_video_url   # import từ cùng thư mục
 
 app = FastAPI()
 
@@ -26,14 +26,15 @@ def home():
 
 @app.post("/download")
 async def download_tiktok(req: TikTokRequest):
-    """Nhận link TikTok, trả về link video không watermark"""
     tiktok_url = req.url.strip()
     if not tiktok_url:
         raise HTTPException(status_code=400, detail="Missing url")
     
-    # Gọi hàm lấy video URL (đã viết sẵn trong tt_saver_api.py)
     video_url = await get_video_url(tiktok_url)
     if not video_url:
         raise HTTPException(status_code=404, detail="Cannot fetch video URL")
     
     return {"ok": True, "video_url": video_url}
+
+# Vercel yêu cầu handler này
+handler = app
